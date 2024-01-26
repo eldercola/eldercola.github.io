@@ -29,7 +29,7 @@ tags:
 
 公式如下：
 $$
-\text{Focal Loss}(p_t) = -\alpha_t(1-p_t)^\gamma \log(p_t)
+ \text{Focal Loss}(p_t) = -\alpha_t(1-p_t)^\gamma \log(p_t)
 $$
 $p_t$的生成过程如下:
 $$
