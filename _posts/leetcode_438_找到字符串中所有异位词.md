@@ -1,0 +1,91 @@
+\---
+
+layout:   post
+
+title:   leetcode 438 找到字符串中所有异位词
+
+subtitle:  双指针滑动窗口
+
+date:    2024-01-26
+
+author:   BY LinShengfeng
+
+header-img: img/post-bg-ios9-web.jpg
+
+catalog: true
+
+tags:
+
+  \- 算法
+
+  \- leetcode
+
+\---
+
+# leetcode 438 找到字符串中所有异位词
+
+## 分析
+
+使用滑动窗口法，固定长度，判别`s`的窗口词和`p`是否一致。判别一致的方法有很多，可以是排序后比一致（步骤复杂度`O(n logn)`），也可以是用字母哈希的方式（即统计单词内各字母的数目，步骤复杂度`O(n)`）。
+
+## 第一版
+
+使用排序后比一致的方法，整体复杂度`O(n^2 logn)`结果测试样例超时。
+
+```C++
+class Solution {
+public:
+    vector<int> findAnagrams(string s, string p) {
+        vector<int> ans = vector<int>();
+        // 使用滑动窗口，指针A为接下来判别的起始位置，指针B为A+p.size()
+        int p_len = p.size();
+        int s_len = s.size();
+        // 给p重排一下
+        sort(p.begin(), p.end());
+        int i = 0;
+        while (i < s_len - p_len + 1) {
+            string temp = s.substr(i, p_len);
+            sort(temp.begin(), temp.end()); // 这一步导致超时
+            if (temp == p) ans.push_back(i);
+        }
+        return ans;
+    }
+};
+```
+
+## 第二版
+
+使用字母哈希的方式，整体复杂度`O(n^2)`
+
+```C++
+class Solution {
+public:
+    bool compareTwoArrays(int a[27], int b[27]) {
+        for (int i = 0; i < 27; i++) if(a[i] != b[i]) return false;
+        return true;
+    }
+    vector<int> findAnagrams(string s, string p) {
+        vector<int> ans = vector<int>();
+        // 使用滑动窗口，指针A为接下来判别的起始位置，指针B为A+p.size()
+        int p_len = p.size();
+        int s_len = s.size();
+        // p 的字母count数组
+        int count[27] = {0};
+        // 如果s比p短，直接返回
+        if (s_len < p_len) return ans;
+        // 记录p的字母
+        for (int i = 0; i < p_len; i++) count[p[i]-'a']++;
+        int countS[27] = {0};
+      	// 初始状态先标记好
+        for (int i = 0; i < p_len; i++) countS[s[i]-'a']++;
+        if (compareTwoArrays(countS, count)) ans.push_back(0);
+        for (int j = p_len; j< s_len; j++) {
+            countS[s[j - p_len] - 'a']--; // 头出
+            countS[s[j] - 'a']++; // 尾进
+            if (compareTwoArrays(countS, count)) ans.push_back(j - p_len + 1);
+        }
+        return ans;
+    }
+};
+```
+
