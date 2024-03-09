@@ -60,3 +60,39 @@ public:
 };
 ```
 
+### 拓展 求最大的K个数
+
+有个改动点：创建最小堆，如此一来用 top() 方法直接可以获取前面元素的下界，如果当前元素X比这个下界大，那么就替换掉。
+
+难点在于创建最小堆的语法，完整代码如下:
+
+```c++
+class Solution {
+public:
+// 自定义比较器，用于最小堆
+struct MinHeapComparator {
+    bool operator()(const int& lhs, const int& rhs) const {
+        return lhs > rhs; // 使得优先队列变成最小堆
+    }
+};
+    vector<int> smallestK(vector<int>& arr, int k) {
+        priority_queue<int, vector<int>, MinHeapComparator> pq;
+        for (int i = 0; i < k; i++) pq.push(arr[i]);
+        if (k > 0) {
+            for (int i = k; i < arr.size(); i++) {
+                if (arr[i] > pq.top()) { // 这里符号有改动
+                    pq.pop();
+                    pq.push(arr[i]);
+                }
+            }
+        }
+        vector<int> ans;
+        for (int i = 0; i < k; i++) {
+            ans.push_back(pq.top());
+            pq.pop();
+        }
+        return ans;
+    }
+};
+```
+
